@@ -32,6 +32,7 @@ $criticalSystemEvt = Get-WinEvent -FilterHashtable @{LogName = "System"; Level =
 $criticalSecurityEvt = Get-WinEvent -FilterHashtable @{LogName = "Security"; Level = 1,2} | ConvertTo-Csv
 $criticalAppEvt = Get-WinEvent -FilterHashtable @{LogName = "Application"; Level = 1,2}| ConvertTo-Csv
 
+# Write script results to various files. 
 $criticalSystemEvt >> .\Documents\criticalsys$date.csv
 $criticalSecurityEvt >> .\Documents\criticalsys$date.csv
 $criticalAppEvt >> .\Documents\criticalsys$date.csv
