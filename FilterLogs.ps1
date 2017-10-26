@@ -5,6 +5,8 @@
 # This program is not done, it's untested, and I can't guarantee that it's actually useful. I wrote it in 2 hours.
 # The list of security event logs was put together EXTREMELY quickly. I probably missed some stuff...
 #
+# Eventually I'll revise the program so it runs the commands on remote systems also. 
+#
 
 # Stores current date
 $currentDate = Get-Date 
