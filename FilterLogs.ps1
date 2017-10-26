@@ -49,9 +49,9 @@ $psScripts  >> .\Documents\psScripts$date.txt
 
 function Last24HoursCritical{
 $compareDate = (Get-Date).AddDays(-1)
-$app = Get-WinEvent -FilterHashtable @{LogName = "Application"; Level = 1,2} | Where-Object {$_.Time -lt $compareDate} | ConvertTo-Csv
-$sys =  Get-WinEvent -FilterHashtable @{LogName = "System"; Level = 1,2} | Where-Object {$_.Time -lt $compareDate} | ConvertTo-Csv
-$sec =  Get-WinEvent -FilterHashtable @{LogName = "Security"; Level = 1,2} | Where-Object {$_.Time -lt $compareDate} | ConvertTo-Csv
+$app = Get-WinEvent -FilterHashtable @{LogName = "Application"; Level = 1,2} | Where-Object {$_.Time -lt $compareDate} |  ConvertTo-Csv
+$sys =  Get-WinEvent -FilterHashtable @{LogName = "System"; Level = 1,2} | Where-Object {$_.Time -lt $compareDate} | Select-Object -ExpandProperty | ConvertTo-Csv
+$sec =  Get-WinEvent -FilterHashtable @{LogName = "Security"; Level = 1,2} | Where-Object {$_.Time -lt $compareDate} | Select-Object -ExpandProperty | ConvertTo-Csv
 #$arr = New-Object System.Collections.ArrayList 
 #[void] $arr.Add($app)
 #[void] $arr.Add($sys)
@@ -255,7 +255,7 @@ $securityIdArr = @(1100,1102,11084616,4618,4625,4649,
 
 # Adds each item retrieved to array of strings
 ForEach($id in $securityIdArr){
-    $evts = @(Get-EventLog "Security" | Where-Object {_.Index -eq $id}) | ConvertTo-Csv
+    $evts = @(Get-EventLog "Security" | Where-Object {_.Index -eq $id}) | Select-Object -ExpandProperty |  ConvertTo-Csv
 }
 # convert Array to String object 
 $holderStr = ""
