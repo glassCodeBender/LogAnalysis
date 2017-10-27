@@ -46,12 +46,82 @@ schtasks | Out-File -FilePath "C:\Users\wobblywudude\Documents\schtasks.txt"
 LogManipulations 
 CountLoginsByUser
 SysMonCreatedProc
+FindUnusualNetUsage
+UnusualServices 
+RegCheck 
+AutostartPrograms 
+CheckProcesses 
 
 # Check system uptime 
 # $performanceCounter = CheckUptime 
 CheckUpTime 
 
 } # END Main()
+
+function GetUsers {
+
+# List of users 
+$netUsers = net user
+$admins = net localgroup administrators
+$concatUsers = "List of users:`r`n`r`n" + $netUsers + "`r`n`r`nList of administrators:`r`n`r`n" + $admins 
+
+$concatUsers | Out-File -FilePath "C:\Users\wobblywudude\Documents\userlist.txt"
+
+}
+
+function CheckProcesses {
+$procDetails = wmic process list full
+$taskWithUsers = tasklist \v 
+$concat = "`r`nProcess Details`r`n:" + $procDetails + "`r`n`r`nTask List with Users:`r`n`r`n" + $taskWithUsers
+$concat | Out-File -FilePath "C:\Users\wobblywudude\Documents\processdetails.txt"
+}
+
+function AutostartPrograms{
+wmic startup list full | Out-File -FilePath "C:\Users\wobblywudude\Documents\autostartprograms.txt"
+
+}
+
+# Check Run Keys
+function RegCheck{
+
+$run = reg query HKLM\Software\Microsoft\Windows\CurrentVersion\Run
+$runOnce = reg query HKLM\Software\Microsoft\Windows\CurrentVersion\RunOnce
+$runOnceEx = reg query HKLM\Software\Microsoft\Windows\CurrentVersion\RunOnceEx
+$reg = $run + "`r`n" + $runOnce + "`r`n" + $runOnceEx
+
+$reg | Out-File -FilePath "C:\Users\wobblywudude\Documents\regCheck.txt"
+} # END RegCheck
+
+function UnusualServices{
+
+# Mapping of which services run out of which process 
+$runningServices = tasklist /svc 
+# List of services
+$netStart = net start 
+$concatSvcs = "`r`nList of available services`r`n`r`n" + $netStart + "`r`n`r`nMapping of running services to processes`r`n`r`n" + $runningServices 
+
+$concatSvcs | Out-File -FilePath "C:\Users\wobblywudude\Documents\services.txt"
+} # END UnusualServices 
+
+function FindUnusualNetUsage{
+
+# Look at file shares so you can check purpose
+$netView = net view \\127.0.0.1
+# Look at who has an open session with the machine
+$netSession = net session
+# Look at which sessions this machine opened with other systems.
+$netUse = net use
+# Find NetBIOS over TCP/IP activity
+$nbtstat = nbtstat -S
+# Find Unusual TCP and UDP Ports
+$netstat = netstat -naob
+$firewallConfig = netsh advfirewall show currentprofile 
+
+$concatNet = "File Share:`r`n`r`n" + $netView + "`r`nMembers with Open Sessions:`r`n`r`n" + $netSession + "`r`nSessions client has open with other systems:`r`n`r`n" + $netUse + "`r`nNetBIOS over TCP/IP activity`r`n`r`n" + $nbtstat + "`r`nListening TCP/UDP Ports`r`n`r`n" + $netstat + "`r`nFirewall Config:`r`n`r`n" + $firewallConfig
+
+$concatNet | Out-File -FilePath "C:\Users\wobblywudude\Documents\netusage.txt"
+
+} # END FindUnusualNetUsage
 
 function CountLoginsByUser{
 Get-WinEvent @{logname="security";id=4624}|%{$_.Properties[5].Value}|Group-Object -NoElement|sort count | Out-File -FilePath "C:\Users\wobblywudude\Documents\loginByUser.txt" 
@@ -87,8 +157,6 @@ function SysMonCreatedProc{
  Get-WinEvent @{logname="Microsoft-Windows-Sysmon/Operational";id=1} | %{$_.Properties[3].Value} | sort -unique| Out-File -FilePath "C:\Users\wobblywudude\Documents\sysmon.txt"
 
 } # END SysMonCreatedProc 
-
-
 
 # Check system performance 
 function CheckUptime{
