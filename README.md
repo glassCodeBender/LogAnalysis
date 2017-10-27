@@ -1,2 +1,2 @@
 # LogAnalysis
-A Couple Scripts I'm Writing to Analyze Log File
+A Couple Scripts I'm Writing to Analyze Log Files
