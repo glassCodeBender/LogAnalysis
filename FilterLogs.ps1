@@ -1,12 +1,18 @@
-#
-# Description: Program grabs some useful security info from Windows and writes to /Documents directory
-#
-# NOTE:
-# This program is not done, it's untested, and I can't guarantee that it's actually useful. I wrote it in 2 hours.
-# The list of security event logs was put together EXTREMELY quickly. I probably missed some stuff...
-#
-# Eventually I'll revise the program so it runs the commands on remote systems also. 
-#
+<#
+.SYNOPSIS
+
+Invoke-LogCheck
+Description: Program grabs some useful security info from Windows and writes to /Documents directory
+
+NOTE: This program is not done, it's untested, and I can't guarantee that it's actually useful. I wrote it in 2 hours.
+The list of security event logs was put together EXTREMELY quickly. I probably missed some stuff...
+
+Eventually I'll revise the program so it runs the commands on remote systems also. 
+#>
+
+# To sign script use: (520-523)
+# See Get-Help Set-AuthicodeSignature
+# #cert = @(Get-ChildItem cert:\currentuser\My -CodeSigning)[0]
 
 # Stores current date
 $currentDate = Get-Date 
@@ -38,14 +44,34 @@ $criticalAppEvt = Get-WinEvent -FilterHashtable @{LogName = "Application"; Level
 $criticalSystemEvt >> .\Documents\criticalsys$date.csv
 $criticalSecurityEvt >> .\Documents\criticalsys$date.csv
 $criticalAppEvt >> .\Documents\criticalsys$date.csv
+# This probably will have to be done with a regex 
 $secEvts >> .\Documents\DANGERsecurityevents$date.csv
 $last24Hours >> .\Documents\last24hourscritical$date.txt
 $psLog >> .\Documents\pslog$date.txt
-$runKey >> .\Documents\runkey$date.txt
+# $runKey >> .\Documents\runkey$date.txt
 $recentlyWritten >> .\Documents\recentlywritten$date.csv
 $psScripts  >> .\Documents\psScripts$date.txt
 
+# CODE NOT WRITTEN TO FILE 
+$schtasks = GetScheduledTasks
+# Check system uptime 
+$performanceCounter = CheckUptime 
+
 } # END Main()
+
+# Check system performance 
+function CheckUptime{
+$counter = Get-Counter "\System\System Up Time"
+$uptime = $counter.CounterSample[0].CookedValue
+
+# Possible: Get-Counter -Computer $computer "\System\System Up Time"
+
+# Get processor uptime (488-489)
+# $computer = $ENV.Computername
+# Get-Counter -Computer $computer "process(_total)\% processor time" 
+$result = New-TimeSpan -Seconds $uptime 
+return $result
+}
 
 function Last24HoursCritical{
 $compareDate = (Get-Date).AddDays(-1)
@@ -63,6 +89,7 @@ $last24 = $app + "`r`n" + $sys + "`r`n" + $sec
 return $last24
 }
 
+# Checks for certain security events by ID
 function CheckSecurityEvts{
 $securityIdArr = @(1100,1102,11084616,4618,4625,4649,
 4650,
@@ -255,7 +282,8 @@ $securityIdArr = @(1100,1102,11084616,4618,4625,4649,
 
 # Adds each item retrieved to array of strings
 ForEach($id in $securityIdArr){
-    $evts = @(Get-EventLog "Security" | Where-Object {_.Index -eq $id}) | Select-Object -ExpandProperty |  ConvertTo-Csv
+    $str = Get-WinEvent @{logname="security";id=$id} | ConvertTo-Csv
+    $evts = @($str)
 }
 # convert Array to String object 
 $holderStr = ""
@@ -263,6 +291,13 @@ $secEvents = $evts | ForEach-Object {$holderStr += "`r`n$_" }
 
 return $secEvts
 } ## END CheckSecurityEvts
+
+# Get scheduled tasks
+function GetScheduledTasks{
+$schtasks = schtasks
+
+return $schtasks
+}
 
 # Find all files written to in last 30 days.
 function GetRecentlyWrittenFiles{
@@ -273,11 +308,11 @@ return $modBeforeDate
 
 # Checks what programs are set in Registry Run Key
 # NOTE: Not sure if this works!!
-function CheckRunKey{
-Set-Location HKCU:
-Set-Location \Software\Microsoft\Windows\CurrentVersion\Run
-return Get-ItemProperty 
-}
+# function CheckRunKey{
+#Set-Location HKCU:
+#Set-Location \Software\Microsoft\Windows\CurrentVersion\Run
+#return Get-ItemProperty 
+#}
 
 # Script to find powershell scripts. I might add more extensions for other programming languages later.
 function FindPowershellScripts{
@@ -285,5 +320,5 @@ $psScripts = Get-ChildItem -Include *.ps1 -Recurse
 return $psScripts
 }
 
-Main 
+. Main 
 Exit 
