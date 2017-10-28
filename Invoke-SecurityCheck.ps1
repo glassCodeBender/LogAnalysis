@@ -55,6 +55,8 @@ CheckProcesses
 # Check system uptime 
 # $performanceCounter = CheckUptime 
 CheckUpTime 
+PsExecEvents
+GetUsers 
 
 } # END Main()
 
@@ -64,10 +66,10 @@ Get-EventLog System -InstanceID 7036 | Export-CSV -Append "C:\Users\wobblywudude
 
 }
 
-function SchtaskEvents{
-Get-EventLog Security -InstanceID 106 | Export-CSV -Path "C:\Users\wobblywudude\Documents\schtasksEvts.csv" -Delimiter '|'
+# function SchtaskEvents{
+# Get-EventLog Security -InstanceID 106 | Export-CSV -Path "C:\Users\wobblywudude\Documents\schtasksEvts.csv" -Delimiter '|'
 
-}
+# }
 
 function GetUsers {
 
