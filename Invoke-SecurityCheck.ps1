@@ -1,7 +1,7 @@
 <#
 .SYNOPSIS
 
-Invoke-LogCheck
+Invoke-SecurityCheck
 Description: Program grabs some useful security info from Windows and writes to /Documents directory
 
 NOTE: This program is not done, it's untested, and I can't guarantee that it's actually useful. I wrote it in 2 hours.
