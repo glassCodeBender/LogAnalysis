@@ -117,16 +117,16 @@ $netStart = net start  | Out-File -Append "C:\Users\wobblywudude\Documents\servi
 function FindUnusualNetUsage{
 
 # Look at file shares so you can check purpose
-$netView = net view \\127.0.0.1 | Out-File -FilePath "C:\Users\wobblywudude\Documents\netusage.txt"
+net view \\127.0.0.1 | Out-File -FilePath "C:\Users\wobblywudude\Documents\netusage.txt"
 # Look at who has an open session with the machine
-$netSession = net session | Out-File -Append "C:\Users\wobblywudude\Documents\netusage.txt"
+net session | Out-File -Append "C:\Users\wobblywudude\Documents\netusage.txt"
 # Look at which sessions this machine opened with other systems.
-$netUse = net use | Out-File -Append "C:\Users\wobblywudude\Documents\netusage.txt"
+net use | Out-File -Append "C:\Users\wobblywudude\Documents\netusage.txt"
 # Find NetBIOS over TCP/IP activity
-$nbtstat = nbtstat -S | Out-File -Append "C:\Users\wobblywudude\Documents\netusage.txt"
+nbtstat -S | Out-File -Append "C:\Users\wobblywudude\Documents\netusage.txt"
 # Find Unusual TCP and UDP Ports
-$netstat = netstat -naob | Out-File -Append "C:\Users\wobblywudude\Documents\netusage.txt"
-$firewallConfig = netsh advfirewall show currentprofile | Out-File -Append "C:\Users\wobblywudude\Documents\netusage.txt"
+netstat -naob | Out-File -Append "C:\Users\wobblywudude\Documents\netusage.txt"
+netsh advfirewall show currentprofile | Out-File -Append "C:\Users\wobblywudude\Documents\netusage.txt"
 
 # $concatNet = "File Share:`r`n`r`n" + $netView + "`r`n`r`nMembers with Open Sessions:`r`n`r`n" + $netSession + "`r`n`r`nSessions client has open with other systems:`r`n`r`n" + $netUse + "`r`n`r`nNetBIOS over TCP/IP activity`r`n`r`n" + $nbtstat + "`r`n`r`nListening TCP/UDP Ports`r`n`r`n" + $netstat + "`r`n`r`nFirewall Config:`r`n`r`n" + $firewallConfig
 
@@ -184,9 +184,10 @@ New-TimeSpan -Seconds $uptime | Out-File -FilePath "C:\Users\wobblywudude\Docume
 
 function Last24HoursCritical{
 $compareDate = (Get-Date).AddDays(-1)
-$app = Get-WinEvent -FilterHashtable @{LogName = "Application"; Level = 1,2} | Where-Object {$_.Time -lt $compareDate} | Export-Csv -Path "C:\Users\wobblywudude\Documents\critical24hrlog.csv" -Delimiter '|'
-$sys = Get-WinEvent -FilterHashtable @{LogName = "System"; Level = 1,2} | Where-Object {$_.Time -lt $compareDate} | Select-Object -ExpandProperty | Export-Csv -Append "C:\Users\wobblywudude\Documents\critical24hrlog.csv" -Delimiter '|'
-$sec = Get-WinEvent -FilterHashtable @{LogName = "Security"; Level = 1,2,3,4} | Where-Object {$_.Time -lt $compareDate} | Select-Object -ExpandProperty | Export-Csv -Append "C:\Users\wobblywudude\Documents\critical24hrlog.csv" -Delimiter '|'
+Get-WinEvent -FilterHashtable @{LogName = "Application"; Level = 1,2} | Where-Object {$_.Time -lt $compareDate} | Export-Csv -Path "C:\Users\wobblywudude\Documents\critical24hrlog.csv" -Delimiter '|'
+Get-WinEvent -FilterHashtable @{LogName = "System"; Level = 1,2} | Where-Object {$_.Time -lt $compareDate} | Select-Object -ExpandProperty | Export-Csv -Append "C:\Users\wobblywudude\Documents\critical24hrlog.csv" -Delimiter '|'
+Get-WinEvent -FilterHashtable @{LogName = "Security"; Level = 1,2,3,4} | Where-Object {$_.Time -lt $compareDate} | Select-Object -ExpandProperty | Export-Csv -Append "C:\Users\wobblywudude\Documents\critical24hrlog.csv" -Delimiter '|'
+
 #$arr = New-Object System.Collections.ArrayList 
 #[void] $arr.Add($app)
 #[void] $arr.Add($sys)
