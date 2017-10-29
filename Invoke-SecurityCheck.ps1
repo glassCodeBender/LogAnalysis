@@ -1,11 +1,11 @@
 <#
 .SYNOPSIS
 
-Invoke-SecurityCheck
-Description: Program grabs some useful security info from Windows and writes to /Documents directory
+.DESCRIPTION
+Program grabs some useful security info from Windows and writes to /Documents directory
 
-NOTE: The list of security event logs was put together EXTREMELY quickly. I probably missed some stuff... 
-I've barely tested the program so I wouldn't use this in a corporate environment w/out testing it. 
+NOTE: The list of security event logs was put together EXTREMELY quickly so I missed some stuff.
+I've barely tested the program so I would definitely not use this in a corporate environment without testing it. 
 
 Eventually I'll revise the program so it runs the commands on remote systems also. 
 #>
@@ -17,11 +17,9 @@ Eventually I'll revise the program so it runs the commands on remote systems als
 # Stores current date
 $currentDate = Get-Date 
 
-# Example:
-# Get-EventLog System -Newest 10 | Format-Table Index, Time, Source, Message -Auto
-
 # This is the main method
 function Main{
+
 # Get powershell log
 Get-EventLog "Windows Powershell" | Export-Csv -Path "C:\Users\wobblywudude\Documents\pslog.csv" -Delimiter '|'
 # looks for all powershell scripts on system if run out of root dir.
@@ -64,7 +62,7 @@ function PsExecEvents{
 Get-EventLog System -InstanceID 7035 | Export-CSV -Path "C:\Users\wobblywudude\Documents\psexecEvts.csv" -Delimiter '|'
 Get-EventLog System -InstanceID 7036 | Export-CSV -Append "C:\Users\wobblywudude\Documents\psexecEvts.csv" -Delimiter '|'
 
-}
+} # END PsExecEvents
 
 # function SchtaskEvents{
 # Get-EventLog Security -InstanceID 106 | Export-CSV -Path "C:\Users\wobblywudude\Documents\schtasksEvts.csv" -Delimiter '|'
@@ -80,20 +78,18 @@ $concatUsers = "List of users:`r`n`r`n" + $netUsers + "`r`n`r`nList of administr
 
 $concatUsers | Out-File -FilePath "C:\Users\wobblywudude\Documents\userlist.txt"
 
-}
+} # END GetUsers
 
 function CheckProcesses {
 $procDetails = wmic process list full
 $taskWithUsers = tasklist \v 
 $concat = "`r`nProcess Details`r`n:" + $procDetails + "`r`n`r`nTask List with Users:`r`n`r`n" + $taskWithUsers
 $concat | Out-File -FilePath "C:\Users\wobblywudude\Documents\processdetails.txt"
-}
+} # END CheckProcesses
 
 function AutostartPrograms{
 wmic startup list full | Out-File -FilePath "C:\Users\wobblywudude\Documents\autostartprograms.txt"
-
-
-}
+} # END AutostartPrograms
 
 # Check Run Keys
 function RegCheck{
@@ -174,8 +170,6 @@ function SysMonCreatedProc{
 
 } # END SysMonCreatedProc 
 
-
-
 # Check system performance 
 function CheckUptime{
 $counter = Get-Counter "\System\System Up Time"
@@ -187,7 +181,7 @@ $uptime = $counter.CounterSample[0].CookedValue
 # $computer = $ENV.Computername
 # Get-Counter -Computer $computer "process(_total)\% processor time" 
 New-TimeSpan -Seconds $uptime | Out-File -FilePath "C:\Users\wobblywudude\Documents\uptime.txt"
-}
+} # END CheckUptime
 
 function Last24HoursCritical{
 $compareDate = (Get-Date).AddDays(-1)
@@ -199,11 +193,11 @@ $sec = Get-WinEvent -FilterHashtable @{LogName = "Security"; Level = 1,2} | Wher
 #[void] $arr.Add($sys)
 #[void] $arr.Add($sec)
 
-}
+} ## END Last24HoursCritical
 
 # Checks for certain security events by ID
 function CheckSecurityEvts{
-[regex] $securityIdArr = "*1100|1102|1108|4616|4618|4625|4649|4650|4651|4652|4653|4654|4655|4656|4657|4659|4660|4663|4670|4671|4672|4688|4690|4691|4692|4693|4697|4698|4699|4701|4702|4703|4704|4705|4706|4709|4710|4712|4713|4714|4715|4717|4716|4718|4719|4720|4722|4725|4726|4727|4728|4732|4738|4740|4741|4742|4744|4745|4746|4756|4764|4767|4771|4772|4774|4775|4777|4780|4781|4782|4790|4794|4797|4798|4816|4819|4820|4821|4822|4823|4824|4825|4830|4864|4868|4869|4870|4871|4873|4882|4884|4885|4887|4888|4895|4896|4946|4947|4948|4949|4950|4951|4952|4953|4954|4957|4958|4960|4961|4962|4963|4964|4965|4976|4977|4978|4979|4980|4981|4982|4983|4984|5024|5025|5026|5027|5028|5029|5030|5031|5032|5033|5034|5035|5037|5038|5040|5041|5042|5043|5044|5045|5046|5047|5048|5049|5050|5057|5071|5120|5121|5122|5123|5124|5126|5143|5137|5145|5148|5151|5150|5152|5155|5156|5157|5158|5159|5168|5376|5377|5378|5451|5452|5453|5456|5457|5478|5479|5480|5483|5484|5485|6144|6145|6273|6276|6277|6279|6281|6406|6418|6423|6423*" # END populate security ID array
+[regex] $securityIdArr = "1100|1102|1108|4616|4618|4625|4649|4650|4651|4652|4653|4654|4655|4656|4657|4659|4660|4663|4670|4671|4672|4688|4690|4691|4692|4693|4697|4698|4699|4701|4702|4703|4704|4705|4706|4709|4710|4712|4713|4714|4715|4717|4716|4718|4719|4720|4722|4725|4726|4727|4728|4732|4738|4740|4741|4742|4744|4745|4746|4756|4764|4767|4771|4772|4774|4775|4777|4780|4781|4782|4790|4794|4797|4798|4816|4819|4820|4821|4822|4823|4824|4825|4830|4864|4868|4869|4870|4871|4873|4882|4884|4885|4887|4888|4895|4896|4946|4947|4948|4949|4950|4951|4952|4953|4954|4957|4958|4960|4961|4962|4963|4964|4965|4976|4977|4978|4979|4980|4981|4982|4983|4984|5024|5025|5026|5027|5028|5029|5030|5031|5032|5033|5034|5035|5037|5038|5040|5041|5042|5043|5044|5045|5046|5047|5048|5049|5050|5057|5071|5120|5121|5122|5123|5124|5126|5143|5137|5145|5148|5151|5150|5152|5155|5156|5157|5158|5159|5168|5376|5377|5378|5451|5452|5453|5456|5457|5478|5479|5480|5483|5484|5485|6144|6145|6273|6276|6277|6279|6281|6406|6418|6423|6423" 
 
 Get-WinEvent @{logname="security";id=$id} | Where-Object {$_.InstanceID -match $securityIdArr}  | Export-Csv -Path "C:\Users\wobblywudude\Documents\dangerSecLog.csv" -Delimiter '|'
 
@@ -211,22 +205,18 @@ Get-WinEvent @{logname="security";id=$id} | Where-Object {$_.InstanceID -match $
 # Look for login types 3,4,8,9,10,11. Remove Types 2 and 7 
 Get-EventLog Security -InstanceID 4624 | Export-CSV -Path C:\Users\wobblywudude\Documents\All_logins.csv -Delimiter '|'
 
-Get-EventLog Security -InstanceID 4624 | Export-CSV -Path C:\Users\wobblywudude\Documents\All_logins.csv -Delimiter '|'
 } ## END CheckSecurityEvts
 
 # Get scheduled tasks
 function GetScheduledTasks{
-
 schtasks | Out-File -FilePath "C:\Users\wobblywudude\Documents\schtasks.txt"
-
-}
+} # END GetScheduledTasks
 
 # Find all files written to in last 30 days.
 function GetRecentlyWrittenFiles{
 $compareDate = (Get-Date).AddDays(-30)
 Get-ChildItem -Recurse | Where-Object {$_.LastWriteTime -lt $compareDate} | Out-File -FilePath "C:\Users\wobblywudude\Documents\recentlyWrittenFiles.txt"
-
-}
+} # END GetRecentlyWrittenFiles
 
 # Checks what programs are set in Registry Run Key
 # NOTE: Not sure if this works!!
