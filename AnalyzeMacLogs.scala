@@ -10,17 +10,19 @@ object AnalyzeMacLogs {
   def main( args: Array[String] ): Unit = {
 
     /** Grab event logs command */
+    val setHost = setHostname()
+    setHost.foreach(println)
     val wifi = getWifi()
+    wifi.foreach(println)
     val failedLogins = failedLogins()
     val errors = errorLogs()
-    val setHost = setHostname()
     val installed = installed()
     val sandbox = sandboxViolation()
     val sudo = sudoCmds()
     val countryCodes = countryCode()
     val ssh = sshCmds()
     val passwordCmds = passwordCmd()
-    
+
   } // END main()
 
   private[this] def getWifi(): Stream[String] = {
@@ -41,15 +43,16 @@ object AnalyzeMacLogs {
     errors.lineStream
   } // END errorLogs()
 
-  private[this] def setHostname(): Stream[String]  = {
-    val setHost = Seq( "log", "show", "--predicate", "'(eventMessage CONTAINS \"setting hostname to\")'"  )
+  /** Testing another style so we can grep it. */
+  private[this] def setHostname(): Vector[String]  = {
+    val setHost = "log show --predicate '(eventMessage CONTAINS \"setting hostname to\")'"
+    val stream = setHost.lineStream_!
 
-    setHost.lineStream
+    stream.toVector
   } // END setHostname()
 
-
   private[this] def installed(): Stream[String]  = {
-    val installed = Seq( "log", "show", "--predicate", "'(eventMessage CONTAINS \"installed\")'" )
+    val installed = Seq( "log", "show", "--predicate", "'(eventMessage CONTAINS \"installed\")'" , "#|", "grep", "-v", "\"storedassetd\"" )
 
     installed.lineStream
   } // END installed()
@@ -83,6 +86,5 @@ object AnalyzeMacLogs {
 
     cmd.lineStream
   } // END installed()
-
 
 } // END AnalyzeMacLogs object
