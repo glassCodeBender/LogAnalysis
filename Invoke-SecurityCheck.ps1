@@ -72,7 +72,7 @@ Get-EventLog System -InstanceID 7036 | Export-CSV -Append "C:\Users\wobblywudude
 function GetUsers {
 
 # List of users 
-$netUsers = net user
+$netUsers = net user 
 $admins = net localgroup administrators
 $concatUsers = "List of users:`r`n`r`n" + $netUsers + "`r`n`r`nList of administrators:`r`n`r`n" + $admins 
 
@@ -118,20 +118,16 @@ $netStart = net start  | Out-File -Append "C:\Users\wobblywudude\Documents\servi
 function FindUnusualNetUsage{
 
 # Look at file shares so you can check purpose
-$netView = net view \\127.0.0.1 
+$netView = net view \\127.0.0.1 | Out-File -FilePath "C:\Users\wobblywudude\Documents\netusage.txt"
 # Look at who has an open session with the machine
-$netSession = net session 
+$netSession = net session | Out-File -Append "C:\Users\wobblywudude\Documents\netusage.txt"
 # Look at which sessions this machine opened with other systems.
-$netUse = net use
+$netUse = net use | Out-File -Append "C:\Users\wobblywudude\Documents\netusage.txt"
 # Find NetBIOS over TCP/IP activity
-$nbtstat = nbtstat -S
+$nbtstat = nbtstat -S | Out-File -Append "C:\Users\wobblywudude\Documents\netusage.txt"
 # Find Unusual TCP and UDP Ports
-$netstat = netstat -naob
-$firewallConfig = netsh advfirewall show currentprofile 
-
-$concatNet = "File Share:`r`n`r`n" + $netView + "`r`n`r`nMembers with Open Sessions:`r`n`r`n" + $netSession + "`r`n`r`nSessions client has open with other systems:`r`n`r`n" + $netUse + "`r`n`r`nNetBIOS over TCP/IP activity`r`n`r`n" + $nbtstat + "`r`n`r`nListening TCP/UDP Ports`r`n`r`n" + $netstat + "`r`n`r`nFirewall Config:`r`n`r`n" + $firewallConfig
-
-$concatNet | Out-File -FilePath "C:\Users\wobblywudude\Documents\netusage.txt"
+$netstat = netstat -naob | Out-File -Append "C:\Users\wobblywudude\Documents\netusage.txt"
+$firewallConfig = netsh advfirewall show currentprofile | Out-File -Apppend "C:\Users\wobblywudude\Documents\netusage.txt"
 
 } # END FindUnusualNetUsage
 
