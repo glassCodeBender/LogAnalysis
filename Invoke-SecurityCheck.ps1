@@ -35,7 +35,7 @@ CheckSecurityEvts
 Last24HoursCritical
 # Get all critical and error events in System, Security and Application event logs
 Get-WinEvent -FilterHashtable @{LogName = "System"; Level = 1,2} | Export-Csv -Path "C:\Users\wobblywudude\Documents\criticalsyslog.csv" -Delimiter '|'
-Get-WinEvent -FilterHashtable @{LogName = "Security"; Level = 1,2} | Export-Csv -Path "C:\Users\wobblywudude\Documents\criticalseclog.csv" -Delimiter '|'
+Get-WinEvent -FilterHashtable @{LogName = "Security"; Level = 1,2,3,4} | Export-Csv -Path "C:\Users\wobblywudude\Documents\criticalseclog.csv" -Delimiter '|'
 Get-WinEvent -FilterHashtable @{LogName = "Application"; Level = 1,2} | Export-Csv -Path "C:\Users\wobblywudude\Documents\criticalapplog.csv" -Delimiter '|'
 
 # Grab Scheduled Tasks
