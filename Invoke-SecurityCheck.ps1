@@ -2,9 +2,11 @@
 .SYNOPSIS
 
 .DESCRIPTION
+
 Program grabs some useful security info from Windows and writes to /Documents directory
 
-NOTE: The list of security event logs was put together EXTREMELY quickly so I missed some stuff.
+NOTE: There are some serious bugs with this program. A lot of the things it claims to query do not work!!!
+The list of security event logs was put together EXTREMELY quickly so I missed some stuff.
 I've barely tested the program so I would definitely not use this in a corporate environment without testing it. 
 
 Eventually I'll revise the program so it runs the commands on remote systems also. 
