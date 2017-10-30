@@ -2,11 +2,9 @@
 .SYNOPSIS
 
 .DESCRIPTION
-
 Program grabs some useful security info from Windows and writes to /Documents directory
 
-NOTE: There are some serious bugs with this program. A lot of the things it claims to query do not work!!!
-The list of security event logs was put together EXTREMELY quickly so I missed some stuff.
+NOTE: The list of security event logs was put together EXTREMELY quickly so I missed some stuff.
 I've barely tested the program so I would definitely not use this in a corporate environment without testing it. 
 
 Eventually I'll revise the program so it runs the commands on remote systems also. 
@@ -15,6 +13,7 @@ Eventually I'll revise the program so it runs the commands on remote systems als
 # To sign script use: (520-523)
 # See Get-Help Set-AuthicodeSignature
 # #cert = @(Get-ChildItem cert:\currentuser\My -CodeSigning)[0]
+
 
 # Stores current date
 $currentDate = Get-Date 
@@ -83,14 +82,17 @@ $concatUsers | Out-File -FilePath "C:\Users\wobblywudude\Documents\userlist.txt"
 }
 
 function CheckProcesses {
-$procDetails = wmic process list full| Out-File -FilePath "C:\Users\wobblywudude\Documents\processdetails.txt"
-$taskWithUsers = tasklist \v | Out-File -Append "C:\Users\wobblywudude\Documents\processdetails.txt"
-}# END CheckProcesses
+$procDetails = wmic process list full
+$taskWithUsers = tasklist \v 
+$concat = "`r`nProcess Details`r`n:" + $procDetails + "`r`n`r`nTask List with Users:`r`n`r`n" + $taskWithUsers
+$concat | Out-File -FilePath "C:\Users\wobblywudude\Documents\processdetails.txt"
+}
 
 function AutostartPrograms{
 wmic startup list full | Out-File -FilePath "C:\Users\wobblywudude\Documents\autostartprograms.txt"
 
-} # END AutostartPrograms
+
+}
 
 # Check Run Keys
 function RegCheck{
@@ -119,16 +121,16 @@ $netStart = net start  | Out-File -Append "C:\Users\wobblywudude\Documents\servi
 function FindUnusualNetUsage{
 
 # Look at file shares so you can check purpose
-net view \\127.0.0.1 | Out-File -FilePath "C:\Users\wobblywudude\Documents\netusage.txt"
+$netView = net view \\127.0.0.1 | Out-File -FilePath "C:\Users\wobblywudude\Documents\netusage.txt"
 # Look at who has an open session with the machine
-net session | Out-File -Append "C:\Users\wobblywudude\Documents\netusage.txt"
+$netSession = net session | Out-File -Append "C:\Users\wobblywudude\Documents\netusage.txt"
 # Look at which sessions this machine opened with other systems.
-net use | Out-File -Append "C:\Users\wobblywudude\Documents\netusage.txt"
+$netUse = net use | Out-File -Append "C:\Users\wobblywudude\Documents\netusage.txt"
 # Find NetBIOS over TCP/IP activity
-nbtstat -S | Out-File -Append "C:\Users\wobblywudude\Documents\netusage.txt"
+$nbtstat = nbtstat -S | Out-File -Append "C:\Users\wobblywudude\Documents\netusage.txt"
 # Find Unusual TCP and UDP Ports
-netstat -naob | Out-File -Append "C:\Users\wobblywudude\Documents\netusage.txt"
-netsh advfirewall show currentprofile | Out-File -Append "C:\Users\wobblywudude\Documents\netusage.txt"
+$netstat = netstat -naob | Out-File -Append "C:\Users\wobblywudude\Documents\netusage.txt"
+$firewallConfig = netsh advfirewall show currentprofile | Out-File -Append "C:\Users\wobblywudude\Documents\netusage.txt"
 
 # $concatNet = "File Share:`r`n`r`n" + $netView + "`r`n`r`nMembers with Open Sessions:`r`n`r`n" + $netSession + "`r`n`r`nSessions client has open with other systems:`r`n`r`n" + $netUse + "`r`n`r`nNetBIOS over TCP/IP activity`r`n`r`n" + $nbtstat + "`r`n`r`nListening TCP/UDP Ports`r`n`r`n" + $netstat + "`r`n`r`nFirewall Config:`r`n`r`n" + $firewallConfig
 
@@ -144,10 +146,11 @@ Get-WinEvent @{logname="security";id=4625}|%{$_.Properties[5].Value}|Group-Objec
 
 function LogManipulations{
 # Check for cleared logs 
-Get-WinEvent @{logname="security";id=1102} | Out-File -FilePath "C:\Users\wobblywudude\Documents\clearedLogs.txt"
+
+Get-EventLog system -InstanceId 104 | Out-File -FilePath "C:\Users\wobblywudude\Documents\clearedLogs.txt"
 
 # Determine who and when security logs were deleted. 
-Get-WinEvent -FilterHashtable @{logname="security";id=4776}|%{$_.Properties[1].Value}|sort -Unique| Out-File -FilePath "C:\Users\wobblywudude\Documents\delSecLogs.txt"
+Get-WinEvent -FilterHashtable @{logname="system";id=104}|%{$_.Properties[1].Value}|sort -Unique| Out-File -FilePath "C:\Users\wobblywudude\Documents\delSecLogs.txt"
 
 ### Error Code and Description ###
 #C0000064 user name does not exist
@@ -171,6 +174,8 @@ function SysMonCreatedProc{
 
 } # END SysMonCreatedProc 
 
+
+
 # Check system performance 
 function CheckUptime{
 $counter = Get-Counter "\System\System Up Time"
@@ -186,10 +191,9 @@ New-TimeSpan -Seconds $uptime | Out-File -FilePath "C:\Users\wobblywudude\Docume
 
 function Last24HoursCritical{
 $compareDate = (Get-Date).AddDays(-1)
-Get-WinEvent -FilterHashtable @{LogName = "Application"; Level = 1,2} | Where-Object {$_.Time -lt $compareDate} | Export-Csv -Path "C:\Users\wobblywudude\Documents\critical24hrlog.csv" -Delimiter '|'
-Get-WinEvent -FilterHashtable @{LogName = "System"; Level = 1,2} | Where-Object {$_.Time -lt $compareDate} | Select-Object -ExpandProperty | Export-Csv -Append "C:\Users\wobblywudude\Documents\critical24hrlog.csv" -Delimiter '|'
-Get-WinEvent -FilterHashtable @{LogName = "Security"; Level = 1,2,3,4} | Where-Object {$_.Time -lt $compareDate} | Select-Object -ExpandProperty | Export-Csv -Append "C:\Users\wobblywudude\Documents\critical24hrlog.csv" -Delimiter '|'
-
+$app = Get-WinEvent -FilterHashtable @{LogName = "Application"; Level = 1,2} | Where-Object {$_.Time -lt $compareDate} | Export-Csv -Path "C:\Users\wobblywudude\Documents\critical24hrlog.csv" -Delimiter '|'
+$sys = Get-WinEvent -FilterHashtable @{LogName = "System"; Level = 1,2} | Where-Object {$_.Time -lt $compareDate} | Select-Object -ExpandProperty | Export-Csv -Append "C:\Users\wobblywudude\Documents\critical24hrlog.csv" -Delimiter '|'
+$sec = Get-WinEvent -FilterHashtable @{LogName = "Security"; Level = 1,2} | Where-Object {$_.Time -lt $compareDate} | Select-Object -ExpandProperty | Export-Csv -Append "C:\Users\wobblywudude\Documents\critical24hrlog.csv" -Delimiter '|'
 #$arr = New-Object System.Collections.ArrayList 
 #[void] $arr.Add($app)
 #[void] $arr.Add($sys)
@@ -217,14 +221,14 @@ schtasks | Out-File -FilePath "C:\Users\wobblywudude\Documents\schtasks.txt"
 $schtasks = schtasks | Where-Object {$_ -NotMatch "N/A"} | Where-Object {$_ -NotMatch "======"} | Where-Object{$_ -NotMatch "TaskName"} | Where-Object {$_ -NotMatch "Folder"} | Where-Object {$_ -NotMatch "Info"}
 $trimmed = $schtasks | Where-Object {$_} 
 $trimmed |  Out-File -FilePath "C:\Users\wobblywudude\Documents\schtasks.txt"
-} # END GetScheduledTasks
+}
 
 # Find all files written to in last 30 days.
 function GetRecentlyWrittenFiles{
 $compareDate = (Get-Date).AddDays(-30)
 Get-ChildItem -Recurse | Where-Object {$_.LastWriteTime -lt $compareDate} | Out-File -FilePath "C:\Users\wobblywudude\Documents\recentlyWrittenFiles.txt"
 
-} # END GetRecentlyWrittenFiles
+}
 
 # Checks what programs are set in Registry Run Key
 # NOTE: Not sure if this works!!
