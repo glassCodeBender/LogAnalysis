@@ -165,7 +165,7 @@ Get-WinEvent -FilterHashtable @{logname="system";id=104}|%{$_.Properties[1].Valu
 #C0000225 evidently a bug in Windows and not a risk
 
 # Identify names of users with logins 
-Get-WinEvent @{logname="security";id=4624} | %{$_.Properties[5].Value} | sort -Unique| Out-File -FilePath "C:\Users\wobblywudude\Documents\users.txt"
+# Get-WinEvent @{logname="security";id=4624} | %{$_.Properties[5].Value} | sort -Unique| Out-File -FilePath "C:\Users\wobblywudude\Documents\users.txt"
 
 } # END LogManipulations 
 
