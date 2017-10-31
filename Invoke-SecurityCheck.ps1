@@ -14,12 +14,8 @@ Eventually I'll revise the program so it runs the commands on remote systems als
 # See Get-Help Set-AuthicodeSignature
 # #cert = @(Get-ChildItem cert:\currentuser\My -CodeSigning)[0]
 
-
 # Stores current date
 $currentDate = Get-Date 
-
-# Example:
-# Get-EventLog System -Newest 10 | Format-Table Index, Time, Source, Message -Auto
 
 # This is the main method
 function Main{
