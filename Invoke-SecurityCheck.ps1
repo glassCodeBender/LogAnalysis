@@ -140,7 +140,6 @@ Get-WinEvent @{logname="security";id=4625}|%{$_.Properties[5].Value}|Group-Objec
 
 function LogManipulations{
 # Check for cleared logs 
-
 Get-EventLog system -InstanceId 104 | Out-File -FilePath "C:\Users\wobblywudude\Documents\clearedLogs.txt"
 
 # Determine who and when security logs were deleted. 
@@ -167,8 +166,6 @@ function SysMonCreatedProc{
  Get-WinEvent @{logname="Microsoft-Windows-Sysmon/Operational";id=1} | %{$_.Properties[3].Value} | sort -unique| Out-File -FilePath "C:\Users\wobblywudude\Documents\sysmon.txt"
 
 } # END SysMonCreatedProc 
-
-
 
 # Check system performance 
 function CheckUptime{
@@ -199,7 +196,7 @@ Get-EventLog System | Where-Object {$_.Time -lt $compareDate} | Select-Object -E
 function CheckSecurityEvts{
 [regex] $securityIdArr = "1100|1102|1108|4616|4618|4625|4649|4650|4651|4652|4653|4654|4655|4656|4657|4659|4660|4663|4670|4671|4672|4688|4690|4691|4692|4693|4697|4698|4699|4701|4702|4703|4704|4705|4706|4709|4710|4712|4713|4714|4715|4717|4716|4718|4719|4720|4722|4725|4726|4727|4728|4732|4738|4740|4741|4742|4744|4745|4746|4756|4764|4767|4771|4772|4774|4775|4777|4780|4781|4782|4790|4794|4797|4798|4816|4819|4820|4821|4822|4823|4824|4825|4830|4864|4868|4869|4870|4871|4873|4882|4884|4885|4887|4888|4895|4896|4946|4947|4948|4949|4950|4951|4952|4953|4954|4957|4958|4960|4961|4962|4963|4964|4965|4976|4977|4978|4979|4980|4981|4982|4983|4984|5024|5025|5026|5027|5028|5029|5030|5031|5032|5033|5034|5035|5037|5038|5040|5041|5042|5043|5044|5045|5046|5047|5048|5049|5050|5057|5071|5120|5121|5122|5123|5124|5126|5143|5137|5145|5148|5151|5150|5152|5155|5156|5157|5158|5159|5168|5376|5377|5378|5451|5452|5453|5456|5457|5478|5479|5480|5483|5484|5485|6144|6145|6273|6276|6277|6279|6281|6406|6418|6423|6423" # END populate security ID array
 
-Get-EventLog Security | Where-Object {$_ -match $securityIdArr}  | Export-Csv -Path "C:\Users\wobblywudude\Documents\dangerSecLog.csv" -Delimiter '|'
+Get-WinEvent @{logname="security"}| Where-Object {$_ -match $securityIdArr}  | Export-Csv -Path "C:\Users\wobblywudude\Documents\dangerSecLog.csv" -Delimiter '|'
 
 # Grab all logins. We can use python program to check logon types later. 
 # Look for login types 3,4,8,9,10,11. Remove Types 2 and 7 
@@ -224,18 +221,15 @@ Get-ChildItem -Recurse | Where-Object {$_.LastWriteTime -lt $compareDate} | Out-
 
 }
 
-# Checks what programs are set in Registry Run Key
-# NOTE: Not sure if this works!!
-# function CheckRunKey{
-#Set-Location HKCU:
-#Set-Location \Software\Microsoft\Windows\CurrentVersion\Run
-#return Get-ItemProperty 
-#}
-
 # Script to find powershell scripts. I might add more extensions for other programming languages later.
 function FindPowershellScripts{
 Get-ChildItem -Include *.ps1 -Recurse | Out-File -FilePath "C:\Users\wobblywudude\Documents\psscripts.txt"
-
+Get-ChildItem -Include *.psm1 -Recurse | Out-File -Append "C:\Users\wobblywudude\Documents\psscripts.txt"
+Get-ChildItem -Include *.psd1 -Recurse | Out-File -Append "C:\Users\wobblywudude\Documents\psscripts.txt"
+Get-ChildItem -Include *.ps1xml -Recurse | Out-File -Append "C:\Users\wobblywudude\Documents\psscripts.txt"
+Get-ChildItem -Include *.pssc -Recurse | Out-File -Append "C:\Users\wobblywudude\Documents\psscripts.txt"
+Get-ChildItem -Include *.ps1xml -Recurse | Out-File -Append "C:\Users\wobblywudude\Documents\psscripts.txt"
+Get-ChildItem -Include *.cdxml -Recurse | Out-File -Append "C:\Users\wobblywudude\Documents\psscripts.txt"
 }
 
 . Main 
