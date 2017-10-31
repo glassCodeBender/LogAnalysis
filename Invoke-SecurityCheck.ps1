@@ -182,9 +182,9 @@ New-TimeSpan -Seconds $uptime | Out-File -FilePath "C:\Users\wobblywudude\Docume
 
 function Last24Hours{
 $compareDate = (Get-Date).AddDays(-1)
-Get-EventLog Application | Where-Object {$_.Time -lt $compareDate} | Export-Csv -Path "C:\Users\wobblywudude\Documents\critical24hrlog.csv" -Delimiter '|'
-Get-EventLog Security | Where-Object {$_.Time -lt $compareDate} | Select-Object -ExpandProperty | Export-Csv -Append "C:\Users\wobblywudude\Documents\critical24hrlog.csv" -Delimiter '|'
-Get-EventLog System | Where-Object {$_.Time -lt $compareDate} | Select-Object -ExpandProperty | Export-Csv -Append "C:\Users\wobblywudude\Documents\critical24hrlog.csv" -Delimiter '|'
+Get-EventLog Application | Where-Object {$_.Time -lt $compareDate} | Export-Csv -Path "C:\Users\wobblywudude\Documents\application24hrlog.csv" -Delimiter '|'
+Get-EventLog Security | Where-Object {$_.Time -lt $compareDate} | Select-Object -ExpandProperty | Export-Csv -Path "C:\Users\wobblywudude\Documents\security24hrlog.csv" -Delimiter '|'
+Get-EventLog System | Where-Object {$_.Time -lt $compareDate} | Select-Object -ExpandProperty | Export-Csv -Path "C:\Users\wobblywudude\Documents\system24hrlog.csv" -Delimiter '|'
 #$arr = New-Object System.Collections.ArrayList 
 #[void] $arr.Add($app)
 #[void] $arr.Add($sys)
