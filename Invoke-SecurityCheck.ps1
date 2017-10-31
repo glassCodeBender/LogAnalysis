@@ -78,10 +78,10 @@ $concatUsers | Out-File -FilePath "C:\Users\wobblywudude\Documents\userlist.txt"
 }
 
 function CheckProcesses {
-$procDetails = wmic process list full
-$taskWithUsers = tasklist \v 
-$concat = "`r`nProcess Details`r`n:" + $procDetails + "`r`n`r`nTask List with Users:`r`n`r`n" + $taskWithUsers
-$concat | Out-File -FilePath "C:\Users\wobblywudude\Documents\processdetails.txt"
+$procDetails = wmic process list full | Out-File -FilePath "C:\Users\wobblywudude\Documents\processdetails.txt"
+$taskWithUsers = tasklist \v | Out-File -Append "C:\Users\wobblywudude\Documents\processdetails.txt"
+# $concat = "`r`nProcess Details`r`n:" + $procDetails + "`r`n`r`nTask List with Users:`r`n`r`n" + $taskWithUsers
+# $concat | Out-File -FilePath "C:\Users\wobblywudude\Documents\processdetails.txt"
 }
 
 function AutostartPrograms{
@@ -143,7 +143,7 @@ function LogManipulations{
 Get-EventLog system -InstanceId 104 | Out-File -FilePath "C:\Users\wobblywudude\Documents\clearedLogs.txt"
 
 # Determine who and when security logs were deleted. 
-Get-WinEvent -FilterHashtable @{logname="system";id=104}|%{$_.Properties[1].Value}|sort -Unique| Out-File -FilePath "C:\Users\wobblywudude\Documents\delSecLogs.txt"
+Get-WinEvent -FilterHashtable @{logname="system";id=104}|%{$_.Properties[1].Value}|sort -Unique| Out-File -FilePath "C:\Users\wobblywudude\Documents\delSecLogUser.txt"
 
 ### Error Code and Description ###
 #C0000064 user name does not exist
