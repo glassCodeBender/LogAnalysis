@@ -17,6 +17,8 @@ Eventually I'll revise the program so it runs the commands on remote systems als
 # Stores current date
 $currentDate = Get-Date 
 
+#### IMPORTANT FOR OTHER USERS ####
+# Path to the directory the program will write to. 
 $pathToDir = "C:\Users\wobblywudude\Documents\"
 
 # This is the main method
