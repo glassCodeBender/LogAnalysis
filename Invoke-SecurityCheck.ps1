@@ -22,7 +22,7 @@ $pathToDir = "C:\Users\wobblywudude\Documents\"
 # This is the main method
 function Main{
 # Get powershell log
-$psPath = $pathToDir + pslog.csv
+$psPath = $pathToDir + "pslog.csv"
 Get-EventLog "Windows Powershell" | Export-Csv -Path $psPath -Delimiter '|'
 # looks for all powershell scripts on system if run out of root dir.
 FindPowershellScripts
@@ -145,7 +145,7 @@ Get-WinEvent @{logname="security";id=4625}|%{$_.Properties[5].Value}|Group-Objec
 function LogManipulations{
 # Check for cleared logs 
 $clearedLogs = $pathToDir + "clearedlogs.txt"
-$delByUserPath = $pathToDir + "DeletedSecurityLogByUser.txt
+$delByUserPath = $pathToDir + "DeletedSecurityLogByUser.txt"
 Get-EventLog system -InstanceId 104 | Out-File -FilePath $clearedLogs
 
 # Determine who and when security logs were deleted. 
