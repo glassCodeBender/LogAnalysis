@@ -1,7 +1,5 @@
 # LogAnalysis
 
-I believe in trust with limitations. In regard to my comment about being used, I think everyone feels like that sometimes. I've felt like I didn't have control over my life for a long time. I understand that it was important that I did not have control because I don't have a full view of what's going on. Nevertheless, I'm tired. That's why I'm reducing my social media footprint. 
-
 WINDOWS LOG ANALYSIS 
 
 Invoke-SecurityCheck is a script I wrote in powershell to analyze log files and grab useful security info. 
